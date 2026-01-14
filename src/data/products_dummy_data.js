@@ -1,0 +1,95 @@
+
+export const dummyProducts = [
+  {
+    id: 1,
+    title: "Essence Mascara",
+    price: 9.99,
+    stock: 99,
+    category: "beauty",
+    rating: 2.56,
+  },
+  {
+    id: 2,
+    title: "Perfume Signature",
+    price: 49.99,
+    stock: 28,
+    category: "beauty",
+    rating: 4.5,
+  },
+  {
+    id: 3,
+    title: "Face Moisturizer",
+    price: 24.99,
+    stock: 45,
+    category: "beauty",
+    rating: 3.8,
+  },
+
+  {
+    id: 4,
+    title: "Gaming Mouse",
+    price: 25.99,
+    stock: 40,
+    category: "electronics",
+    rating: 4.3,
+  },
+  {
+    id: 5,
+    title: "Smart Watch",
+    price: 129.99,
+    stock: 25,
+    category: "electronics",
+    rating: 4.6,
+  },
+  {
+    id: 6,
+    title: "Bluetooth Speaker",
+    price: 39.99,
+    stock: 35,
+    category: "electronics",
+    rating: 4.4,
+  },
+
+  {
+    id: 7,
+    title: "Men Casual T-Shirt",
+    price: 14.99,
+    stock: 120,
+    category: "fashion",
+    rating: 4.1,
+  },
+  {
+    id: 8,
+    title: "Denim Jeans",
+    price: 34.99,
+    stock: 65,
+    category: "fashion",
+    rating: 4.2,
+  },
+
+  {
+    id: 9,
+    title: "Office Chair",
+    price: 89.99,
+    stock: 15,
+    category: "home",
+    rating: 4.4,
+  },
+  {
+    id: 10,
+    title: "Coffee Maker",
+    price: 74.99,
+    stock: 18,
+    category: "home",
+    rating: 4.2,
+  },
+
+  {
+    id: 11,
+    title: "Running Shoes",
+    price: 59.99,
+    stock: 30,
+    category: "sports",
+    rating: 4.5,
+  },
+];
