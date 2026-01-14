@@ -6,24 +6,20 @@ import ProductView from './view';
 import * as service from './service';
 
 const ProductsModule = () => {
-    // --- Data State ---
     const [products, setProducts] = useState([]);
 
-    // --- UI State ---
     const [searchQuery, setSearchQuery] = useState('');
     const [filterCategory, setFilterCategory] = useState('all');
     const [sortBy, setSortBy] = useState('default');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
 
-    // --- Side Effects ---
     useEffect(() => {
         service.getProducts()
             .then(setProducts)
             .catch(() => toast.error('Failed to load products'));
     }, []);
 
-    // --- Logic: Filtering and Sorting ---
     const displayedProducts = useMemo(() => {
         let result = [...products];
 
@@ -42,7 +38,6 @@ const ProductsModule = () => {
         });
     }, [products, searchQuery, filterCategory, sortBy]);
 
-    // --- Logic: CRUD Operations ---
     const saveProduct = async () => {
         if (!currentProduct.title || !currentProduct.price) {
             return toast.warn('Title and Price are required');
@@ -75,7 +70,6 @@ const ProductsModule = () => {
         }
     };
 
-    // --- Context holds the Data, Props hold the UI control ---
     return (
         <ProductContext.Provider value={displayedProducts}>
             <ProductView

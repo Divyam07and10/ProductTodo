@@ -1,4 +1,4 @@
-
+/* DUMMY DATA FOR TESTING */
 export const dummyProducts = [
   {
     id: 1,

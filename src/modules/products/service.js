@@ -1,14 +1,12 @@
-
 import { dummyProducts } from '../../data/products_dummy_data';
 
-// Simulate a database
 let products = [...dummyProducts];
 
 export const getProducts = () => {
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve([...products]);
-        }, 500); // Simulate network delay
+        }, 800);
     });
 };
 
@@ -17,7 +15,6 @@ export const addProduct = (product) => {
         setTimeout(() => {
             const newProduct = {
                 ...product,
-                // Simple ID generation
                 id: products.length > 0 ? Math.max(...products.map((p) => p.id)) + 1 : 1,
             };
             products = [newProduct, ...products];

@@ -21,7 +21,6 @@ import RestaurantIcon from '@mui/icons-material/Restaurant';
 
 import { useProductContext } from '../../context/ProductContext';
 
-// NECESSARY CONSTANT
 const CATEGORIES = [
     { value: 'beauty', label: 'Beauty', icon: <BrushIcon fontSize="small" /> },
     { value: 'electronics', label: 'Electronics', icon: <DevicesIcon fontSize="small" /> },
@@ -33,16 +32,13 @@ const CATEGORIES = [
 ];
 
 const ProductView = ({ ui, actions }) => {
-    // UI state from props
     const { searchQuery, filterCategory, sortBy, isDialogOpen, currentProduct } = ui;
-    // Shared data from context
     const products = useProductContext();
 
     return (
         <Box sx={{ p: 4, maxWidth: 1400, mx: 'auto' }}>
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 4 }}>Product Catalog</Typography>
 
-            {/* Toolbar */}
             <Paper elevation={0} sx={{ p: 2, mb: 4, borderRadius: 4, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', border: '1px solid #e0e0e0' }}>
                 <TextField
                     placeholder="Search..."
@@ -77,7 +73,6 @@ const ProductView = ({ ui, actions }) => {
                 <Button variant="contained" size="large" onClick={actions.onAdd} startIcon={<AddIcon />} sx={{ height: 56, ml: 'auto' }}>Add Product</Button>
             </Paper>
 
-            {/* Table */}
             <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 4, border: '1px solid #e0e0e0' }}>
                 <Table>
                     <TableHead sx={{ bgcolor: '#f8f9fa' }}>
@@ -99,7 +94,6 @@ const ProductView = ({ ui, actions }) => {
                                     </TableCell>
                                     <TableCell>
                                         <Box display="flex" alignItems="center">
-                                            {/* Rating component displays stars based on the 'value' prop */}
                                             <Rating value={p.rating || 0} readOnly size="small" precision={0.5} />
                                             <Typography variant="caption" sx={{ ml: 0.5 }}>({p.rating})</Typography>
                                         </Box>
@@ -117,7 +111,6 @@ const ProductView = ({ ui, actions }) => {
                 </Table>
             </TableContainer>
 
-            {/* Dialog */}
             <Dialog open={isDialogOpen} onClose={actions.onClose} fullWidth maxWidth="sm">
                 <DialogTitle>
                     {currentProduct?.id ? 'Edit Product' : 'Add Product'}

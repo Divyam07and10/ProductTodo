@@ -4,7 +4,6 @@ import ProductsModule from './modules/products';
 import App from './App';
 import Layout from './shared/components/Layout';
 
-// Navigation Wrapper to easy switching
 const AppRoutes = () => {
     return (
         <Routes>
@@ -12,7 +11,6 @@ const AppRoutes = () => {
             <Route element={<Layout />}>
                 <Route path="/products" element={<ProductsModule />} />
             </Route>
-            {/* Add new routes here easily */}
         </Routes>
     );
 };
