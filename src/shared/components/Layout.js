@@ -8,10 +8,10 @@ import Footer from './Footer';
 
 const Layout = () => {
     return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '150vh' }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <ToastContainer position="top-right" autoClose={2500} theme="colored" />
             <Header />
-            <Box component="main" sx={{ flexGrow: 1, py: 3 }}>
+            <Box component="main" sx={{ flexGrow: 1, py: 3, pt: 10 }}>
                 <Outlet />
             </Box>
             <Footer />

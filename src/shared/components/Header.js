@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 const Header = () => {
     return (
-        <AppBar position="static" color="default" elevation={1} sx={{ backgroundColor: 'white' }}>
+        <AppBar position="fixed" color="default" elevation={1} sx={{ backgroundColor: 'white' }}>
             <Toolbar>
                 <Typography variant="h6" component={Link} to="/" sx={{ textDecoration: 'none', color: 'inherit', fontWeight: 'bold' }}>
                     ProductTodo
