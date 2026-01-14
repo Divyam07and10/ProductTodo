@@ -3,7 +3,7 @@ import React from 'react';
 import {
     Box, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
     Paper, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, Select, MenuItem,
-    InputLabel, FormControl, Typography, Stack, Chip, Rating, Tooltip
+    InputLabel, FormControl, Typography, Stack, Chip, Rating, FormHelperText
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -11,28 +11,12 @@ import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
-import BrushIcon from '@mui/icons-material/Brush';
-import DevicesIcon from '@mui/icons-material/Devices';
-import CheckroomIcon from '@mui/icons-material/Checkroom';
-import HomeIcon from '@mui/icons-material/Home';
-import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
-import ChildCareIcon from '@mui/icons-material/ChildCare';
-import RestaurantIcon from '@mui/icons-material/Restaurant';
 
 import { useProductContext } from '../../context/ProductContext';
-
-const CATEGORIES = [
-    { value: 'beauty', label: 'Beauty', icon: <BrushIcon fontSize="small" /> },
-    { value: 'electronics', label: 'Electronics', icon: <DevicesIcon fontSize="small" /> },
-    { value: 'fashion', label: 'Fashion', icon: <CheckroomIcon fontSize="small" /> },
-    { value: 'home', label: 'Home', icon: <HomeIcon fontSize="small" /> },
-    { value: 'sports', label: 'Sports', icon: <SportsSoccerIcon fontSize="small" /> },
-    { value: 'kids', label: 'Kids', icon: <ChildCareIcon fontSize="small" /> },
-    { value: 'food', label: 'Food', icon: <RestaurantIcon fontSize="small" /> },
-];
+import { CATEGORIES } from '../../lib/constants';
 
 const ProductView = ({ ui, actions }) => {
-    const { searchQuery, filterCategory, sortBy, isDialogOpen, currentProduct } = ui;
+    const { searchQuery, filterCategory, sortBy, isDialogOpen, currentProduct, productIdToDelete, formErrors } = ui;
     const products = useProductContext();
 
     return (
@@ -74,12 +58,16 @@ const ProductView = ({ ui, actions }) => {
             </Paper>
 
             <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 4, border: '1px solid #e0e0e0' }}>
-                <Table>
+                <Table sx={{ tableLayout: 'fixed' }}>
                     <TableHead sx={{ bgcolor: '#f8f9fa' }}>
                         <TableRow>
-                            {['ID', 'Title', 'Category', 'Rating', 'Price', 'Stock', 'Actions'].map(h => (
-                                <TableCell key={h} sx={{ fontWeight: 'bold' }} align={h === 'Actions' ? 'right' : 'left'}>{h}</TableCell>
-                            ))}
+                            <TableCell sx={{ fontWeight: 'bold', width: '60px' }}>ID</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', width: '30%' }}>Title</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', width: '15%' }}>Category</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', width: '15%' }}>Rating</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', width: '12%' }}>Price</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', width: '10%' }}>Stock</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold', width: '10%' }} align="right">Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -88,21 +76,21 @@ const ProductView = ({ ui, actions }) => {
                             return (
                                 <TableRow key={p.id} hover>
                                     <TableCell>#{p.id}</TableCell>
-                                    <TableCell sx={{ fontWeight: 500 }}>{p.title}</TableCell>
+                                    <TableCell sx={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</TableCell>
                                     <TableCell>
                                         <Chip icon={cat.icon} label={cat.label} size="small" sx={{ bgcolor: '#e3f2fd', color: '#1565c0' }} />
                                     </TableCell>
                                     <TableCell>
                                         <Box display="flex" alignItems="center">
-                                            <Rating value={p.rating || 0} readOnly size="small" precision={0.5} />
+                                            <Rating value={parseFloat(p.rating) || 0} readOnly size="small" precision={0.5} />
                                             <Typography variant="caption" sx={{ ml: 0.5 }}>({p.rating})</Typography>
                                         </Box>
                                     </TableCell>
                                     <TableCell sx={{ fontWeight: 'bold' }}>${p.price}</TableCell>
                                     <TableCell sx={{ color: p.stock < 10 ? 'red' : 'inherit' }}>{p.stock}</TableCell>
                                     <TableCell align="right">
-                                        <Tooltip title="Edit"><IconButton onClick={() => actions.onEdit(p)} size="small" color="primary" sx={{ mr: 1 }}><EditIcon /></IconButton></Tooltip>
-                                        <Tooltip title="Delete"><IconButton onClick={() => actions.onDelete(p.id)} size="small" color="error"><DeleteIcon /></IconButton></Tooltip>
+                                        <IconButton onClick={() => actions.onEdit(p)} size="small" color="primary" sx={{ mr: 1 }}><EditIcon fontSize="small" /></IconButton>
+                                        <IconButton onClick={() => actions.onDeleteClick(p.id)} size="small" color="error"><DeleteIcon fontSize="small" /></IconButton>
                                     </TableCell>
                                 </TableRow>
                             );
@@ -114,38 +102,81 @@ const ProductView = ({ ui, actions }) => {
             <Dialog open={isDialogOpen} onClose={actions.onClose} fullWidth maxWidth="sm">
                 <DialogTitle>
                     {currentProduct?.id ? 'Edit Product' : 'Add Product'}
-                    <IconButton
-                        onClick={actions.onClose}
-                        sx={{ position: 'absolute', right: 8, top: 8, color: 'grey.500' }}
-                    >
-                        <CloseIcon />
-                    </IconButton>
+                    <IconButton onClick={actions.onClose} sx={{ position: 'absolute', right: 8, top: 8, color: 'grey.500' }}><CloseIcon /></IconButton>
                 </DialogTitle>
                 <DialogContent dividers>
                     <Stack spacing={3} sx={{ mt: 1 }}>
-                        <TextField label="Title" fullWidth value={currentProduct?.title || ''} onChange={(e) => actions.onInputChange('title', e.target.value)} />
-                        <FormControl fullWidth>
-                            <InputLabel>Category</InputLabel>
-                            <Select value={currentProduct?.category || ''} label="Category" onChange={(e) => actions.onInputChange('category', e.target.value)}>
+                        <TextField
+                            required
+                            label="Title"
+                            fullWidth
+                            value={currentProduct?.title || ''}
+                            onChange={(e) => actions.onInputChange('title', e.target.value)}
+                            error={!!formErrors.title}
+                            helperText={formErrors.title}
+                        />
+                        <FormControl fullWidth required error={!!formErrors.category}>
+                            <InputLabel id="category-label">Category</InputLabel>
+                            <Select labelId="category-label" value={currentProduct?.category || ''} label="Category" onChange={(e) => actions.onInputChange('category', e.target.value)}>
                                 {CATEGORIES.map(cat => (
                                     <MenuItem key={cat.value} value={cat.value}>
-                                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                                            {cat.icon}{cat.label}
-                                        </Box>
+                                        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>{cat.icon}{cat.label}</Box>
                                     </MenuItem>
                                 ))}
                             </Select>
+                            {formErrors.category && <FormHelperText>{formErrors.category}</FormHelperText>}
                         </FormControl>
-                        <TextField label="Rating (0-5)" type="number" fullWidth value={currentProduct?.rating || ''} onChange={(e) => actions.onInputChange('rating', e.target.value)} />
+                        <TextField
+                            required
+                            label="Rating"
+                            type="number"
+                            fullWidth
+                            value={currentProduct?.rating || ''}
+                            onChange={(e) => actions.onInputChange('rating', e.target.value)}
+                            error={!!formErrors.rating}
+                            helperText={formErrors.rating}
+                        />
                         <Stack direction="row" spacing={2}>
-                            <TextField label="Price" type="number" fullWidth value={currentProduct?.price || ''} onChange={(e) => actions.onInputChange('price', e.target.value)} />
-                            <TextField label="Stock" type="number" fullWidth value={currentProduct?.stock || ''} onChange={(e) => actions.onInputChange('stock', e.target.value)} />
+                            <TextField
+                                required
+                                label="Price"
+                                type="number"
+                                fullWidth
+                                value={currentProduct?.price || ''}
+                                onChange={(e) => actions.onInputChange('price', e.target.value)}
+                                error={!!formErrors.price}
+                                helperText={formErrors.price}
+                            />
+                            <TextField
+                                required
+                                label="Stock"
+                                type="number"
+                                fullWidth
+                                value={currentProduct?.stock || ''}
+                                onChange={(e) => actions.onInputChange('stock', e.target.value)}
+                                error={!!formErrors.stock}
+                                helperText={formErrors.stock}
+                            />
                         </Stack>
                     </Stack>
                 </DialogContent>
                 <DialogActions sx={{ p: 2 }}>
                     <Button onClick={actions.onClose}>Cancel</Button>
                     <Button onClick={actions.onSave} variant="contained">Save</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={Boolean(productIdToDelete)} onClose={actions.onDeleteCancel}>
+                <DialogTitle>
+                    Confirm Deletion
+                    <IconButton onClick={actions.onDeleteCancel} sx={{ position: 'absolute', right: 8, top: 8, color: 'grey.500' }}><CloseIcon /></IconButton>
+                </DialogTitle>
+                <DialogContent dividers sx={{ borderBottom: 'none' }}>
+                    <Typography>Are you sure you want to delete this product? This action cannot be undone.</Typography>
+                </DialogContent>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button onClick={actions.onDeleteCancel}>Cancel</Button>
+                    <Button onClick={actions.onDeleteConfirm} variant="contained" color="error">Delete</Button>
                 </DialogActions>
             </Dialog>
         </Box>
