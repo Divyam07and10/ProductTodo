@@ -71,30 +71,38 @@ const ProductView = ({ ui, actions }) => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {products.map(p => {
-                            const cat = CATEGORIES.find(c => c.value === p.category) || { label: p.category };
-                            return (
-                                <TableRow key={p.id} hover>
-                                    <TableCell>#{p.id}</TableCell>
-                                    <TableCell sx={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</TableCell>
-                                    <TableCell>
-                                        <Chip icon={cat.icon} label={cat.label} size="small" sx={{ bgcolor: '#e3f2fd', color: '#1565c0' }} />
-                                    </TableCell>
-                                    <TableCell>
-                                        <Box display="flex" alignItems="center">
-                                            <Rating value={parseFloat(p.rating) || 0} readOnly size="small" precision={0.5} />
-                                            <Typography variant="caption" sx={{ ml: 0.5 }}>({p.rating})</Typography>
-                                        </Box>
-                                    </TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>${p.price}</TableCell>
-                                    <TableCell sx={{ color: p.stock < 10 ? 'red' : 'inherit' }}>{p.stock}</TableCell>
-                                    <TableCell align="right">
-                                        <IconButton onClick={() => actions.onEdit(p)} size="small" color="primary" sx={{ mr: 1 }}><EditIcon fontSize="small" /></IconButton>
-                                        <IconButton onClick={() => actions.onDeleteClick(p.id)} size="small" color="error"><DeleteIcon fontSize="small" /></IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            );
-                        })}
+                        {products.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={7} align="center" sx={{ py: 8 }}>
+                                    <Typography variant="h6" color="textSecondary">No products found</Typography>
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            products.map(p => {
+                                const cat = CATEGORIES.find(c => c.value === p.category) || { label: p.category };
+                                return (
+                                    <TableRow key={p.id} hover>
+                                        <TableCell>#{p.id}</TableCell>
+                                        <TableCell sx={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</TableCell>
+                                        <TableCell>
+                                            <Chip icon={cat.icon} label={cat.label} size="small" sx={{ bgcolor: '#e3f2fd', color: '#1565c0' }} />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Box display="flex" alignItems="center">
+                                                <Rating value={parseFloat(p.rating) || 0} readOnly size="small" precision={0.5} />
+                                                <Typography variant="caption" sx={{ ml: 0.5 }}>({p.rating})</Typography>
+                                            </Box>
+                                        </TableCell>
+                                        <TableCell sx={{ fontWeight: 'bold' }}>${p.price}</TableCell>
+                                        <TableCell sx={{ color: p.stock < 10 ? 'red' : 'inherit' }}>{p.stock}</TableCell>
+                                        <TableCell align="right">
+                                            <IconButton onClick={() => actions.onEdit(p)} size="small" color="primary" sx={{ mr: 1 }}><EditIcon fontSize="small" /></IconButton>
+                                            <IconButton onClick={() => actions.onDeleteClick(p.id)} size="small" color="error"><DeleteIcon fontSize="small" /></IconButton>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })
+                        )}
                     </TableBody>
                 </Table>
             </TableContainer>
