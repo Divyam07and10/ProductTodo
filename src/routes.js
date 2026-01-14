@@ -1,11 +1,8 @@
-
 import React from 'react';
-import { Routes, Route, Link } from 'react-router-dom';
-import App from './App';
+import { Routes, Route } from 'react-router-dom';
 import ProductsModule from './modules/products';
-import { Box, Button } from '@mui/material';
-
-import Layout from './modules/shared/Layout';
+import App from './App';
+import Layout from './shared/components/Layout';
 
 // Navigation Wrapper to easy switching
 const AppRoutes = () => {

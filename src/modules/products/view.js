@@ -1,31 +1,9 @@
 
 import React from 'react';
 import {
-    Box,
-    Button,
-    TextField,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    Paper,
-    IconButton,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-    Tooltip,
-    Select,
-    MenuItem,
-    InputLabel,
-    FormControl,
-    Typography,
-    Stack,
-    InputAdornment,
-    Chip,
-    Rating,
+    Box, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
+    Paper, IconButton, Dialog, DialogActions, DialogContent, DialogTitle, Select, MenuItem,
+    InputLabel, FormControl, Typography, Stack, Chip, Rating, Tooltip
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -33,8 +11,6 @@ import AddIcon from '@mui/icons-material/Add';
 import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
-
-// Category Icons
 import BrushIcon from '@mui/icons-material/Brush';
 import DevicesIcon from '@mui/icons-material/Devices';
 import CheckroomIcon from '@mui/icons-material/Checkroom';
@@ -43,6 +19,9 @@ import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
 import ChildCareIcon from '@mui/icons-material/ChildCare';
 import RestaurantIcon from '@mui/icons-material/Restaurant';
 
+import { useProductContext } from '../../context/ProductContext';
+
+// NECESSARY CONSTANT
 const CATEGORIES = [
     { value: 'beauty', label: 'Beauty', icon: <BrushIcon fontSize="small" /> },
     { value: 'electronics', label: 'Electronics', icon: <DevicesIcon fontSize="small" /> },
@@ -53,313 +32,127 @@ const CATEGORIES = [
     { value: 'food', label: 'Food', icon: <RestaurantIcon fontSize="small" /> },
 ];
 
-const ProductView = ({
-    products,
-    searchQuery,
-    onSearchChange,
-    filterCategory,
-    onFilterChange,
-    sortBy,
-    onSortChange,
-    onClearFilters,
-    onAddClick,
-    onEditClick,
-    onDeleteClick,
-    isDialogOpen,
-    handleDialogClose,
-    handleDialogSave,
-    currentProduct,
-    handleInputChange,
-}) => {
+const ProductView = ({ ui, actions }) => {
+    // UI state from props
+    const { searchQuery, filterCategory, sortBy, isDialogOpen, currentProduct } = ui;
+    // Shared data from context
+    const products = useProductContext();
 
     return (
-        <Box sx={{ padding: 4, maxWidth: '1400px', margin: '0 auto' }}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', marginBottom: 4, color: '#2c3e50' }}>
-                Product Catalog
-            </Typography>
+        <Box sx={{ p: 4, maxWidth: 1400, mx: 'auto' }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 4 }}>Product Catalog</Typography>
 
             {/* Toolbar */}
-            <Paper elevation={0} sx={{
-                padding: 2,
-                marginBottom: 4,
-                borderRadius: 4,
-                display: 'flex',
-                gap: 2,
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                backgroundColor: '#ffffff',
-                border: '1px solid #e0e0e0'
-            }}>
+            <Paper elevation={0} sx={{ p: 2, mb: 4, borderRadius: 4, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', border: '1px solid #e0e0e0' }}>
                 <TextField
-                    placeholder="Search products..."
-                    variant="outlined"
-                    size="medium"
+                    placeholder="Search..."
                     value={searchQuery}
-                    onChange={onSearchChange}
-                    sx={{
-                        flexGrow: 1,
-                        minWidth: '250px',
-                        '& .MuiOutlinedInput-root': {
-                            borderRadius: '12px',
-                            backgroundColor: '#f8f9fa',
-                            '& fieldset': { borderColor: '#e0e0e0' },
-                            '&:hover fieldset': { borderColor: '#bdbdbd' },
-                        }
-                    }}
-                    InputProps={{
-                        startAdornment: (
-                            <InputAdornment position="start">
-                                <SearchIcon color="action" />
-                            </InputAdornment>
-                        ),
-                    }}
+                    onChange={(e) => actions.setSearchQuery(e.target.value)}
+                    sx={{ flexGrow: 1, minWidth: 250 }}
+                    InputProps={{ startAdornment: <SearchIcon color="action" sx={{ mr: 1 }} /> }}
                 />
 
-                <FormControl size="medium" sx={{ minWidth: 200 }}>
+                <FormControl sx={{ minWidth: 200 }}>
                     <InputLabel>Category</InputLabel>
-                    <Select
-                        value={filterCategory}
-                        label="Category"
-                        onChange={onFilterChange}
-                        sx={{ borderRadius: '12px' }}
-                        renderValue={(selected) => {
-                            if (selected === 'all') return 'All Categories';
-                            const cat = CATEGORIES.find(c => c.value === selected);
-                            return (
-                                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                                    {cat?.icon}
-                                    {cat?.label}
-                                </Box>
-                            );
-                        }}
-                    >
+                    <Select value={filterCategory} label="Category" onChange={(e) => actions.setFilterCategory(e.target.value)}>
                         <MenuItem value="all">All Categories</MenuItem>
                         {CATEGORIES.map(cat => (
                             <MenuItem key={cat.value} value={cat.value}>
-                                <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center' }}>
-                                    {cat.icon}
-                                    {cat.label}
-                                </Box>
+                                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>{cat.icon}{cat.label}</Box>
                             </MenuItem>
                         ))}
                     </Select>
                 </FormControl>
 
-                <FormControl size="medium" sx={{ minWidth: 200 }}>
+                <FormControl sx={{ minWidth: 200 }}>
                     <InputLabel>Sort By</InputLabel>
-                    <Select
-                        value={sortBy}
-                        label="Sort By"
-                        onChange={onSortChange}
-                        sx={{ borderRadius: '12px' }}
-                    >
+                    <Select value={sortBy} label="Sort By" onChange={(e) => actions.setSortBy(e.target.value)}>
                         <MenuItem value="default">Default (ID)</MenuItem>
                         <MenuItem value="price_asc">Price: Low to High</MenuItem>
                         <MenuItem value="price_desc">Price: High to Low</MenuItem>
                     </Select>
                 </FormControl>
 
-                <Button
-                    variant="outlined"
-                    size="large"
-                    startIcon={<RefreshIcon />}
-                    onClick={onClearFilters}
-                    sx={{
-                        borderRadius: '12px',
-                        height: '56px',
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        color: '#5f6368',
-                        borderColor: '#e0e0e0',
-                        '&:hover': { borderColor: '#bdbdbd', backgroundColor: '#f5f5f5' }
-                    }}
-                >
-                    Clear
-                </Button>
-
-
-                <Button
-                    variant="contained"
-                    size="large"
-                    startIcon={<AddIcon />}
-                    onClick={onAddClick}
-                    sx={{
-                        borderRadius: '12px',
-                        paddingX: 3,
-                        height: '56px',
-                        textTransform: 'none',
-                        fontWeight: 600,
-                        boxShadow: 'none',
-                        backgroundColor: '#1976d2',
-                        '&:hover': { backgroundColor: '#1565c0', boxShadow: '0 4px 12px rgba(25, 118, 210, 0.2)' },
-                        ml: 'auto'
-                    }}
-                >
-                    Add Product
-                </Button>
+                <Button variant="outlined" size="large" onClick={actions.onClear} startIcon={<RefreshIcon />} sx={{ height: 56 }}>Reset</Button>
+                <Button variant="contained" size="large" onClick={actions.onAdd} startIcon={<AddIcon />} sx={{ height: 56, ml: 'auto' }}>Add Product</Button>
             </Paper>
 
-            {/* Product Table */}
-            <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 4, border: '1px solid #e0e0e0', overflow: 'hidden' }}>
-                <Table sx={{ minWidth: 650 }}>
-                    <TableHead sx={{ backgroundColor: '#f8f9fa' }}>
+            {/* Table */}
+            <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 4, border: '1px solid #e0e0e0' }}>
+                <Table>
+                    <TableHead sx={{ bgcolor: '#f8f9fa' }}>
                         <TableRow>
-                            <TableCell sx={{ fontWeight: 'bold', color: '#5f6368' }}>ID</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold', color: '#5f6368' }}>Title</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold', color: '#5f6368' }}>Category</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold', color: '#5f6368' }}>Rating</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold', color: '#5f6368' }}>Price</TableCell>
-                            <TableCell sx={{ fontWeight: 'bold', color: '#5f6368' }}>Stock</TableCell>
-                            <TableCell align="right" sx={{ fontWeight: 'bold', color: '#5f6368' }}>Actions</TableCell>
+                            {['ID', 'Title', 'Category', 'Rating', 'Price', 'Stock', 'Actions'].map(h => (
+                                <TableCell key={h} sx={{ fontWeight: 'bold' }} align={h === 'Actions' ? 'right' : 'left'}>{h}</TableCell>
+                            ))}
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {products.length > 0 ? (
-                            products.map((row) => (
-                                <TableRow
-                                    key={row.id}
-                                    hover
-                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                                >
-                                    <TableCell sx={{ color: '#5f6368', fontWeight: 500 }}>
-                                        #{row.id}
-                                    </TableCell>
-                                    <TableCell sx={{ fontWeight: 500, fontSize: '1rem' }}>{row.title}</TableCell>
+                        {products.map(p => {
+                            const cat = CATEGORIES.find(c => c.value === p.category) || { label: p.category };
+                            return (
+                                <TableRow key={p.id} hover>
+                                    <TableCell>#{p.id}</TableCell>
+                                    <TableCell sx={{ fontWeight: 500 }}>{p.title}</TableCell>
                                     <TableCell>
-                                        <Chip
-                                            icon={CATEGORIES.find(c => c.value === row.category)?.icon}
-                                            label={row.category}
-                                            size="small"
-                                            sx={{ textTransform: 'capitalize', backgroundColor: '#e3f2fd', color: '#1565c0', fontWeight: 500 }}
-                                        />
+                                        <Chip icon={cat.icon} label={cat.label} size="small" sx={{ bgcolor: '#e3f2fd', color: '#1565c0' }} />
                                     </TableCell>
                                     <TableCell>
                                         <Box display="flex" alignItems="center">
-                                            <Rating value={row.rating || 0} readOnly size="small" precision={0.5} />
-                                            <Typography variant="caption" sx={{ ml: 0.5, color: 'text.secondary' }}>({row.rating})</Typography>
+                                            {/* Rating component displays stars based on the 'value' prop */}
+                                            <Rating value={p.rating || 0} readOnly size="small" precision={0.5} />
+                                            <Typography variant="caption" sx={{ ml: 0.5 }}>({p.rating})</Typography>
                                         </Box>
                                     </TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>${row.price}</TableCell>
-                                    <TableCell>
-                                        <span style={{ color: row.stock < 10 ? '#d32f2f' : 'inherit', fontWeight: row.stock < 10 ? 'bold' : 'normal' }}>
-                                            {row.stock}
-                                        </span>
-                                    </TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' }}>${p.price}</TableCell>
+                                    <TableCell sx={{ color: p.stock < 10 ? 'red' : 'inherit' }}>{p.stock}</TableCell>
                                     <TableCell align="right">
-                                        <Tooltip title="Edit">
-                                            <IconButton onClick={() => onEditClick(row)} size="small" sx={{ color: '#1976d2', backgroundColor: '#e3f2fd', mr: 1, '&:hover': { backgroundColor: '#bbdefb' } }}>
-                                                <EditIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
-                                        <Tooltip title="Delete">
-                                            <IconButton onClick={() => onDeleteClick(row.id)} size="small" sx={{ color: '#d32f2f', backgroundColor: '#ffebee', '&:hover': { backgroundColor: '#ffcdd2' } }}>
-                                                <DeleteIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
+                                        <Tooltip title="Edit"><IconButton onClick={() => actions.onEdit(p)} size="small" color="primary" sx={{ mr: 1 }}><EditIcon /></IconButton></Tooltip>
+                                        <Tooltip title="Delete"><IconButton onClick={() => actions.onDelete(p.id)} size="small" color="error"><DeleteIcon /></IconButton></Tooltip>
                                     </TableCell>
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={7} align="center" sx={{ py: 8 }}>
-                                    <Typography variant="h6" color="textSecondary" gutterBottom>
-                                        No products found
-                                    </Typography>
-                                </TableCell>
-                            </TableRow>
-                        )}
+                            );
+                        })}
                     </TableBody>
                 </Table>
             </TableContainer>
 
-            {/* Add/Edit Dialog */}
-            <Dialog
-                open={isDialogOpen}
-                onClose={handleDialogClose}
-                fullWidth
-                maxWidth="sm"
-            >
-                <DialogTitle sx={{ m: 0, p: 2, pr: 6 }}>
-                    {currentProduct?.id ? 'Edit Product' : 'Add New Product'}
+            {/* Dialog */}
+            <Dialog open={isDialogOpen} onClose={actions.onClose} fullWidth maxWidth="sm">
+                <DialogTitle>
+                    {currentProduct?.id ? 'Edit Product' : 'Add Product'}
                     <IconButton
-                        aria-label="close"
-                        onClick={handleDialogClose}
-                        sx={{
-                            position: 'absolute',
-                            right: 8,
-                            top: 8,
-                            color: (theme) => theme.palette.grey[500],
-                        }}
+                        onClick={actions.onClose}
+                        sx={{ position: 'absolute', right: 8, top: 8, color: 'grey.500' }}
                     >
                         <CloseIcon />
                     </IconButton>
                 </DialogTitle>
-                <DialogContent>
+                <DialogContent dividers>
                     <Stack spacing={3} sx={{ mt: 1 }}>
-                        <TextField
-                            autoFocus
-                            label="Product Title"
-                            fullWidth
-                            variant="outlined"
-                            value={currentProduct?.title || ''}
-                            onChange={(e) => handleInputChange('title', e.target.value)}
-                        />
-
+                        <TextField label="Title" fullWidth value={currentProduct?.title || ''} onChange={(e) => actions.onInputChange('title', e.target.value)} />
                         <FormControl fullWidth>
                             <InputLabel>Category</InputLabel>
-                            <Select
-                                value={currentProduct?.category || ''}
-                                label="Category"
-                                onChange={(e) => handleInputChange('category', e.target.value)}
-                            >
-                                {CATEGORIES.map((cat) => (
+                            <Select value={currentProduct?.category || ''} label="Category" onChange={(e) => actions.onInputChange('category', e.target.value)}>
+                                {CATEGORIES.map(cat => (
                                     <MenuItem key={cat.value} value={cat.value}>
                                         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                                            {cat.icon}
-                                            {cat.label}
+                                            {cat.icon}{cat.label}
                                         </Box>
                                     </MenuItem>
                                 ))}
                             </Select>
                         </FormControl>
-
-                        <TextField
-                            label="Rating (0-5)"
-                            type="number"
-                            fullWidth
-                            variant="outlined"
-                            value={currentProduct?.rating || ''}
-                            onChange={(e) => handleInputChange('rating', e.target.value)}
-                            InputProps={{ inputProps: { min: 0, max: 5, step: 0.1 } }}
-                        />
-
+                        <TextField label="Rating (0-5)" type="number" fullWidth value={currentProduct?.rating || ''} onChange={(e) => actions.onInputChange('rating', e.target.value)} />
                         <Stack direction="row" spacing={2}>
-                            <TextField
-                                label="Price ($)"
-                                type="number"
-                                fullWidth
-                                variant="outlined"
-                                value={currentProduct?.price || ''}
-                                onChange={(e) => handleInputChange('price', e.target.value)}
-                                InputProps={{ inputProps: { min: 0 } }}
-                            />
-                            <TextField
-                                label="Stock"
-                                type="number"
-                                fullWidth
-                                variant="outlined"
-                                value={currentProduct?.stock || ''}
-                                onChange={(e) => handleInputChange('stock', e.target.value)}
-                                InputProps={{ inputProps: { min: 0 } }}
-                            />
+                            <TextField label="Price" type="number" fullWidth value={currentProduct?.price || ''} onChange={(e) => actions.onInputChange('price', e.target.value)} />
+                            <TextField label="Stock" type="number" fullWidth value={currentProduct?.stock || ''} onChange={(e) => actions.onInputChange('stock', e.target.value)} />
                         </Stack>
                     </Stack>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleDialogClose}>Cancel</Button>
-                    <Button onClick={handleDialogSave} variant="contained">
-                        Save Product
-                    </Button>
+                <DialogActions sx={{ p: 2 }}>
+                    <Button onClick={actions.onClose}>Cancel</Button>
+                    <Button onClick={actions.onSave} variant="contained">Save</Button>
                 </DialogActions>
             </Dialog>
         </Box>

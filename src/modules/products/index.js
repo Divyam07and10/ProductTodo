@@ -1,155 +1,99 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { toast } from 'react-toastify';
+import ProductContext from '../../context/ProductContext';
 import ProductView from './view';
-import { getProducts, addProduct, updateProduct, deleteProduct } from './service';
+import * as service from './service';
 
 const ProductsModule = () => {
+    // --- Data State ---
     const [products, setProducts] = useState([]);
+
+    // --- UI State ---
     const [searchQuery, setSearchQuery] = useState('');
     const [filterCategory, setFilterCategory] = useState('all');
     const [sortBy, setSortBy] = useState('default');
-
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
 
-    // Fetch products on mount
+    // --- Side Effects ---
     useEffect(() => {
-        fetchProducts();
+        service.getProducts()
+            .then(setProducts)
+            .catch(() => toast.error('Failed to load products'));
     }, []);
 
-    const fetchProducts = async () => {
-        try {
-            const data = await getProducts();
-            setProducts(data);
-        } catch (error) {
-            toast.error('Failed to fetch products');
-        }
-    };
-
-    // Advanced Filtering and Sorting Logic
-    const processedProducts = useMemo(() => {
+    // --- Logic: Filtering and Sorting ---
+    const displayedProducts = useMemo(() => {
         let result = [...products];
 
-        // 1. Filter by Search
         if (searchQuery) {
-            const lowerQuery = searchQuery.toLowerCase();
-            result = result.filter(p =>
-                p.title.toLowerCase().includes(lowerQuery)
-            );
+            result = result.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()));
         }
 
-        // 2. Filter by Category
         if (filterCategory !== 'all') {
             result = result.filter(p => p.category === filterCategory);
         }
 
-        // 3. Sorting
-        switch (sortBy) {
-            case 'price_asc':
-                result.sort((a, b) => a.price - b.price);
-                break;
-            case 'price_desc':
-                result.sort((a, b) => b.price - a.price);
-                break;
-            default:
-                // Default sort by ID Ascending (1, 2, 3...)
-                result.sort((a, b) => a.id - b.id);
-                break;
-        }
-
-        return result;
+        return result.sort((a, b) => {
+            if (sortBy === 'price_asc') return a.price - b.price;
+            if (sortBy === 'price_desc') return b.price - a.price;
+            return a.id - b.id;
+        });
     }, [products, searchQuery, filterCategory, sortBy]);
 
-
-    const handleSearchChange = (e) => setSearchQuery(e.target.value);
-    const handleFilterChange = (e) => setFilterCategory(e.target.value);
-    const handleSortChange = (e) => setSortBy(e.target.value);
-
-    const handleClearFilters = () => {
-        setSearchQuery('');
-        setFilterCategory('all');
-        setSortBy('default');
-    };
-
-    const handleAddClick = () => {
-        setCurrentProduct({});
-        setIsDialogOpen(true);
-    };
-
-    const handleEditClick = (product) => {
-        setCurrentProduct({ ...product });
-        setIsDialogOpen(true);
-    };
-
-    const handleDeleteClick = async (id) => {
-        if (window.confirm('Are you sure you want to delete this product?')) {
-            try {
-                await deleteProduct(id);
-                setProducts(products.filter((p) => p.id !== id));
-                toast.success('Product deleted successfully');
-            } catch (error) {
-                toast.error('Failed to delete product');
-            }
-        }
-    };
-
-    const handleDialogClose = () => {
-        setIsDialogOpen(false);
-        setCurrentProduct(null);
-    };
-
-    const handleDialogSave = async () => {
+    // --- Logic: CRUD Operations ---
+    const saveProduct = async () => {
         if (!currentProduct.title || !currentProduct.price) {
-            toast.warn('Please fill in required fields (Title, Price)');
-            return;
+            return toast.warn('Title and Price are required');
         }
 
         try {
-            if (currentProduct.id) {
-                // Update
-                const updated = await updateProduct(currentProduct);
-                setProducts(products.map((p) => (p.id === updated.id ? updated : p)));
-                toast.success('Product updated successfully');
-            } else {
-                // Add
-                const added = await addProduct(currentProduct);
-                setProducts([...products, added]); // Add to end to maintain ID order somewhat naturally, or re-sort will handle it
-                toast.success('Product added successfully');
-            }
-            handleDialogClose();
-        } catch (error) {
-            toast.error('Failed to save product');
+            const isEdit = !!currentProduct.id;
+            const saved = await (isEdit ? service.updateProduct(currentProduct) : service.addProduct(currentProduct));
+
+            setProducts(prev => isEdit
+                ? prev.map(p => p.id === saved.id ? saved : p)
+                : [...prev, saved]
+            );
+
+            toast.success(`Product ${isEdit ? 'updated' : 'added'}`);
+            setIsDialogOpen(false);
+        } catch (err) {
+            toast.error('Save operation failed');
         }
     };
 
-    const handleInputChange = (field, value) => {
-        setCurrentProduct((prev) => ({ ...prev, [field]: value }));
+    const deleteProduct = async (id) => {
+        if (!window.confirm('Are you sure you want to delete this product?')) return;
+        try {
+            await service.deleteProduct(id);
+            setProducts(prev => prev.filter(p => p.id !== id));
+            toast.success('Product deleted');
+        } catch (err) {
+            toast.error('Delete operation failed');
+        }
     };
 
+    // --- Context holds the Data, Props hold the UI control ---
     return (
-        <>
-            <ToastContainer position="bottom-right" autoClose={3000} theme="colored" />
+        <ProductContext.Provider value={displayedProducts}>
             <ProductView
-                products={processedProducts}
-                searchQuery={searchQuery}
-                onSearchChange={handleSearchChange}
-                filterCategory={filterCategory}
-                onFilterChange={handleFilterChange}
-                sortBy={sortBy}
-                onSortChange={handleSortChange}
-                onClearFilters={handleClearFilters}
-                onAddClick={handleAddClick}
-                onEditClick={handleEditClick}
-                onDeleteClick={handleDeleteClick}
-                isDialogOpen={isDialogOpen}
-                handleDialogClose={handleDialogClose}
-                handleDialogSave={handleDialogSave}
-                currentProduct={currentProduct}
-                handleInputChange={handleInputChange}
+                ui={{ searchQuery, filterCategory, sortBy, isDialogOpen, currentProduct }}
+                actions={{
+                    setSearchQuery,
+                    setFilterCategory,
+                    setSortBy,
+                    onClear: () => { setSearchQuery(''); setFilterCategory('all'); setSortBy('default'); },
+                    onAdd: () => { setCurrentProduct({}); setIsDialogOpen(true); },
+                    onEdit: (p) => { setCurrentProduct({ ...p }); setIsDialogOpen(true); },
+                    onDelete: deleteProduct,
+                    onClose: () => setIsDialogOpen(false),
+                    onSave: saveProduct,
+                    onInputChange: (k, v) => setCurrentProduct(prev => ({ ...prev, [k]: v }))
+                }}
             />
-        </>
+        </ProductContext.Provider>
     );
 };
 
