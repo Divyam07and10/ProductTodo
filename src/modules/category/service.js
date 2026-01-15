@@ -27,17 +27,17 @@ export const updateCategory = (updatedCategory) => {
     return new Promise((resolve) => {
         setTimeout(() => {
             categories = categories.map((c) =>
-                (c.value === updatedCategory.value || c.id === updatedCategory.id) ? updatedCategory : c
+                c.id === updatedCategory.id ? updatedCategory : c
             );
             resolve([...categories]);
         }, 500);
     });
 };
 
-export const deleteCategory = (value) => {
+export const deleteCategory = (id) => {
     return new Promise((resolve) => {
         setTimeout(() => {
-            categories = categories.filter((c) => c.value !== value);
+            categories = categories.filter((c) => (c.id !== id && c.value !== id));
             resolve([...categories]);
         }, 500);
     });
