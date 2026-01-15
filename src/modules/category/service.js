@@ -1,9 +1,11 @@
 import { CATEGORIES } from '../../lib/constants';
 
+let categories = [...CATEGORIES];
+
 export const getCategories = () => {
     return new Promise((resolve) => {
         setTimeout(() => {
-            resolve([...CATEGORIES]);
+            resolve([...categories]);
         }, 500);
     });
 };
@@ -13,10 +15,10 @@ export const addCategory = (category) => {
         setTimeout(() => {
             const newCategory = {
                 ...category,
-                id: CATEGORIES.length > 0 ? Math.max(...CATEGORIES.map((c) => c.id)) + 1 : 1,
+                id: categories.length > 0 ? Math.max(...categories.map((c) => c.id)) + 1 : 1,
             };
-            CATEGORIES = [...CATEGORIES, newCategory];
-            resolve([...CATEGORIES]);
+            categories = [...categories, newCategory];
+            resolve([...categories]);
         }, 500);
     });
 };
@@ -24,10 +26,10 @@ export const addCategory = (category) => {
 export const updateCategory = (updatedCategory) => {
     return new Promise((resolve) => {
         setTimeout(() => {
-            CATEGORIES = CATEGORIES.map((c) =>
+            categories = categories.map((c) =>
                 (c.value === updatedCategory.value || c.id === updatedCategory.id) ? updatedCategory : c
             );
-            resolve([...CATEGORIES]);
+            resolve([...categories]);
         }, 500);
     });
 };
@@ -35,8 +37,8 @@ export const updateCategory = (updatedCategory) => {
 export const deleteCategory = (value) => {
     return new Promise((resolve) => {
         setTimeout(() => {
-            CATEGORIES = CATEGORIES.filter((c) => c.value !== value);
-            resolve([...CATEGORIES]);
+            categories = categories.filter((c) => c.value !== value);
+            resolve([...categories]);
         }, 500);
     });
 };
