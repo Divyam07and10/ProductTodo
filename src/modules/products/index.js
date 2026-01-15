@@ -18,22 +18,25 @@ const ProductsModule = () => {
     }, []);
 
     const displayedProducts = useMemo(() => {
-        let result = [...products];
-        if (searchQuery) result = result.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()));
-        if (filterCategory !== 'all') result = result.filter(p => p.category === filterCategory);
-        return result.sort((a, b) => {
-            if (sortBy === 'price_asc') return a.price - b.price;
-            if (sortBy === 'price_desc') return b.price - a.price;
-            return a.id - b.id;
-        });
+        return products
+            .filter(p => {
+                const matchesSearch = !searchQuery || p.title.toLowerCase().includes(searchQuery.toLowerCase());
+                const matchesCategory = filterCategory === 'all' || p.category === filterCategory;
+                return matchesSearch && matchesCategory;
+            })
+            .sort((a, b) => {
+                if (sortBy === 'price_asc') return a.price - b.price;
+                if (sortBy === 'price_desc') return b.price - a.price;
+                return a.id - b.id;
+            });
     }, [products, searchQuery, filterCategory, sortBy]);
 
     const handleSave = async (e) => {
         e.preventDefault();
         try {
             const isEdit = !!currentProduct.id;
-            const saved = await (isEdit ? service.updateProduct(currentProduct) : service.addProduct(currentProduct));
-            setProducts(prev => isEdit ? prev.map(p => p.id === saved.id ? saved : p) : [...prev, saved]);
+            const data = await (isEdit ? service.updateProduct(currentProduct) : service.addProduct(currentProduct));
+            setProducts(data);
             toast.success(`Product ${isEdit ? 'updated' : 'added'} successfully`);
             setIsDialogOpen(false);
         } catch (err) {
@@ -43,8 +46,8 @@ const ProductsModule = () => {
 
     const handleDelete = async () => {
         try {
-            await service.deleteProduct(productIdToDelete);
-            setProducts(prev => prev.filter(p => p.id !== productIdToDelete));
+            const data = await service.deleteProduct(productIdToDelete);
+            setProducts(data);
             toast.success('Product deleted successfully');
             setProductIdToDelete(null);
         } catch (err) {

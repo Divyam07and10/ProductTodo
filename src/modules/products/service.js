@@ -18,7 +18,7 @@ export const addProduct = (product) => {
                 id: products.length > 0 ? Math.max(...products.map((p) => p.id)) + 1 : 1,
             };
             products = [newProduct, ...products];
-            resolve(newProduct);
+            resolve([...products]);
         }, 500);
     });
 };
@@ -29,7 +29,7 @@ export const updateProduct = (updatedProduct) => {
             products = products.map((p) =>
                 p.id === updatedProduct.id ? updatedProduct : p
             );
-            resolve(updatedProduct);
+            resolve([...products]);
         }, 500);
     });
 };
@@ -38,7 +38,7 @@ export const deleteProduct = (id) => {
     return new Promise((resolve) => {
         setTimeout(() => {
             products = products.filter((p) => p.id !== id);
-            resolve(id);
+            resolve([...products]);
         }, 500);
     });
 };
