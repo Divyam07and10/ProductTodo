@@ -12,6 +12,7 @@ const Header = () => {
                 <Box sx={{ flexGrow: 1 }} />
                 <Button color="inherit" component={Link} to="/">Home</Button>
                 <Button color="inherit" component={Link} to="/products">Products</Button>
+                <Button color="inherit" component={Link} to="/category">Category</Button>
             </Toolbar>
         </AppBar>
     );
