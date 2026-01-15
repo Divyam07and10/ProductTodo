@@ -73,7 +73,7 @@ const ProductView = () => {
                                 const cat = CATEGORIES.find(c => c.value === p.category) || { label: p.category };
                                 return (
                                     <TableRow key={p.id} hover>
-                                        <TableCell>#{p.id}</TableCell>
+                                        <TableCell>{p.id}</TableCell>
                                         <TableCell sx={{ fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.title}</TableCell>
                                         <TableCell><Chip icon={cat.icon} label={cat.label} size="small" sx={{ bgcolor: '#e3f2fd', color: '#1565c0' }} /></TableCell>
                                         <TableCell><Box display="flex" alignItems="center"><Rating value={parseFloat(p.rating) || 0} readOnly size="small" precision={0.5} /><Typography variant="caption" sx={{ ml: 0.5 }}>({p.rating})</Typography></Box></TableCell>
