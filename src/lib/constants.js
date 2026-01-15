@@ -1,18 +1,9 @@
-
-import BrushIcon from '@mui/icons-material/Brush';
-import DevicesIcon from '@mui/icons-material/Devices';
-import CheckroomIcon from '@mui/icons-material/Checkroom';
-import HomeIcon from '@mui/icons-material/Home';
-import SportsSoccerIcon from '@mui/icons-material/SportsSoccer';
-import ChildCareIcon from '@mui/icons-material/ChildCare';
-import RestaurantIcon from '@mui/icons-material/Restaurant';
-
 export const CATEGORIES = [
-    { value: 'beauty', label: 'Beauty', icon: <BrushIcon fontSize="small" /> },
-    { value: 'electronics', label: 'Electronics', icon: <DevicesIcon fontSize="small" /> },
-    { value: 'fashion', label: 'Fashion', icon: <CheckroomIcon fontSize="small" /> },
-    { value: 'home', label: 'Home', icon: <HomeIcon fontSize="small" /> },
-    { value: 'sports', label: 'Sports', icon: <SportsSoccerIcon fontSize="small" /> },
-    { value: 'kids', label: 'Kids', icon: <ChildCareIcon fontSize="small" /> },
-    { value: 'food', label: 'Food', icon: <RestaurantIcon fontSize="small" /> },
+    { id: 1, value: 'beauty', label: 'Beauty', color: '#e91e63' },
+    { id: 2, value: 'electronics', label: 'Electronics', color: '#2196f3' },
+    { id: 3, value: 'fashion', label: 'Fashion', color: '#9c27b0' },
+    { id: 4, value: 'home', label: 'Home', color: '#4caf50' },
+    { id: 5, value: 'sports', label: 'Sports', color: '#ff9800' },
+    { id: 6, value: 'kids', label: 'Kids', color: '#795548' },
+    { id: 7, value: 'food', label: 'Food', color: '#f44336' },
 ];
