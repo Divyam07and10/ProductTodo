@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import ProductContext from '../../context/ProductContext';
@@ -13,12 +12,9 @@ const ProductsModule = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [currentProduct, setCurrentProduct] = useState(null);
     const [productIdToDelete, setProductIdToDelete] = useState(null);
-    const [formErrors, setFormErrors] = useState({});
 
     useEffect(() => {
-        service.getProducts()
-            .then(setProducts)
-            .catch(() => toast.error('Failed to load products'));
+        service.getProducts().then(setProducts).catch(() => toast.error('Failed to load products'));
     }, []);
 
     const displayedProducts = useMemo(() => {
@@ -32,42 +28,20 @@ const ProductsModule = () => {
         });
     }, [products, searchQuery, filterCategory, sortBy]);
 
-    const validate = () => {
-        const errors = {};
-        const { title, category, price, stock, rating } = currentProduct || {};
-
-        if (!title) errors.title = 'Title is required';
-        if (!category) errors.category = 'Category is required';
-
-        const p = parseFloat(price);
-        if (isNaN(p) || p < 1) errors.price = 'Price must be at least 1';
-
-        const s = parseInt(stock);
-        if (isNaN(s) || s < 1) errors.stock = 'Stock must be at least 1';
-
-        const r = parseFloat(rating);
-        if (isNaN(r) || r < 0 || r > 5) errors.rating = 'Rating must be 0-5';
-
-        setFormErrors(errors);
-        return Object.keys(errors).length === 0;
-    };
-
-    const saveProduct = async () => {
-        if (!validate()) return;
-
+    const handleSave = async (e) => {
+        e.preventDefault();
         try {
             const isEdit = !!currentProduct.id;
             const saved = await (isEdit ? service.updateProduct(currentProduct) : service.addProduct(currentProduct));
             setProducts(prev => isEdit ? prev.map(p => p.id === saved.id ? saved : p) : [...prev, saved]);
             toast.success(`Product ${isEdit ? 'updated' : 'added'} successfully`);
             setIsDialogOpen(false);
-            setFormErrors({});
         } catch (err) {
             toast.error('Save failed');
         }
     };
 
-    const confirmDelete = async () => {
+    const handleDelete = async () => {
         try {
             await service.deleteProduct(productIdToDelete);
             setProducts(prev => prev.filter(p => p.id !== productIdToDelete));
@@ -78,31 +52,28 @@ const ProductsModule = () => {
         }
     };
 
+    const contextValue = {
+        products: displayedProducts,
+        searchQuery, setSearchQuery,
+        filterCategory, setFilterCategory,
+        sortBy, setSortBy,
+        isDialogOpen, setIsDialogOpen,
+        currentProduct, setCurrentProduct,
+        productIdToDelete, setProductIdToDelete,
+        onSave: handleSave,
+        onDeleteConfirm: handleDelete,
+        onClear: () => { setSearchQuery(''); setFilterCategory('all'); setSortBy('default'); toast.success('Filters Reseted Successfully'); },
+        onAdd: () => { setCurrentProduct({}); setIsDialogOpen(true); },
+        onEdit: (p) => { setCurrentProduct({ ...p }); setIsDialogOpen(true); },
+        onDeleteClick: (id) => setProductIdToDelete(id),
+        onDeleteCancel: () => setProductIdToDelete(null),
+        onClose: () => setIsDialogOpen(false),
+        onInputChange: (k, v) => setCurrentProduct(prev => ({ ...prev, [k]: v }))
+    };
+
     return (
-        <ProductContext.Provider value={displayedProducts}>
-            <ProductView
-                ui={{ searchQuery, filterCategory, sortBy, isDialogOpen, currentProduct, productIdToDelete, formErrors }}
-                actions={{
-                    setSearchQuery,
-                    setFilterCategory,
-                    setSortBy,
-                    onClear: () => {
-                        setSearchQuery(''); setFilterCategory('all'); setSortBy('default');
-                        toast.success('Filters Reseted Successfully');
-                    },
-                    onAdd: () => { setCurrentProduct({}); setIsDialogOpen(true); setFormErrors({}); },
-                    onEdit: (p) => { setCurrentProduct({ ...p }); setIsDialogOpen(true); setFormErrors({}); },
-                    onDeleteClick: (id) => setProductIdToDelete(id),
-                    onDeleteConfirm: confirmDelete,
-                    onDeleteCancel: () => setProductIdToDelete(null),
-                    onClose: () => { setIsDialogOpen(false); setFormErrors({}); },
-                    onSave: saveProduct,
-                    onInputChange: (k, v) => {
-                        setCurrentProduct(prev => ({ ...prev, [k]: v }));
-                        if (formErrors[k]) setFormErrors(prev => ({ ...prev, [k]: null }));
-                    }
-                }}
-            />
+        <ProductContext.Provider value={contextValue}>
+            <ProductView />
         </ProductContext.Provider>
     );
 };
