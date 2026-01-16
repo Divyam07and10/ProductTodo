@@ -55,6 +55,24 @@ export const CategoryProvider = ({ children }) => {
             return;
         }
 
+        const newChildren = currentCategory.children || [];
+        if (newChildren.length > 0) {
+            const hasCycle = (id, visited = new Set()) => {
+                if (String(id) === String(currentCategory.id)) return true;
+                if (visited.has(id)) return false;
+                visited.add(id);
+                const category = categories.find(c => String(c.id) === String(id));
+                if (!category?.children) return false;
+                return category.children.some(childId =>
+                    hasCycle(childId, new Set(visited))
+                );
+            };
+            if (newChildren.some(childId => hasCycle(childId))) {
+                toast.error('A category cannot have its parent or ancestor as a child.');
+                return;
+            }
+        }
+
         try {
             const categoryToSave = {
                 ...currentCategory,
