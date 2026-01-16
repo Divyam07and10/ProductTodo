@@ -12,6 +12,7 @@ const AppRoutes = () => {
             <Route element={<Layout />}>
                 <Route path="/products" element={<ProductsModule />} />
                 <Route path="/category" element={<CategoryModule />} />
+                <Route path="/category/:id" element={<CategoryModule />} />
             </Route>
         </Routes>
     );
