@@ -1,7 +1,7 @@
 import React from 'react';
 import {
     Dialog, DialogActions, DialogContent, DialogTitle, TextField, Button, Stack, Box, Typography, IconButton,
-    FormControl, InputLabel, Select, MenuItem, OutlinedInput, Chip
+    FormControl, InputLabel, Select, MenuItem, OutlinedInput
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -35,14 +35,6 @@ const CategoryDialog = ({ open, currentCategory, onClose, onSave, onInputChange,
                                 value={currentCategory?.children || []}
                                 onChange={(e) => onInputChange('children', typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value)}
                                 input={<OutlinedInput label="Children Categories" />}
-                                renderValue={(selected) => (
-                                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                                        {selected.map((value) => {
-                                            const category = categories.find(c => c.id === value);
-                                            return <Chip key={value} label={category ? category.value : value} />;
-                                        })}
-                                    </Box>
-                                )}
                             >
                                 {availableCategories.map((c) => (
                                     <MenuItem key={c.id || c.value} value={c.id || c.value}>

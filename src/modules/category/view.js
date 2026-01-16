@@ -1,7 +1,6 @@
 import React from 'react';
 import {
-    Box, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Paper, IconButton, Typography, Stack, Chip
+    Box, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Typography
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -67,16 +66,9 @@ const CategoryView = () => {
                                         {c.value || '-'}
                                     </TableCell>
                                     <TableCell>
-                                        <Stack direction="row" gap={0.5} flexWrap="wrap">
-                                            {c.children && c.children.length > 0 ? (
-                                                c.children.map((childId) => {
-                                                    const child = categories.find(cat => cat.id === childId);
-                                                    return <Chip key={childId} label={child ? child.value : childId} size="small" />;
-                                                })
-                                            ) : (
-                                                <Typography variant="caption" color="textSecondary">-</Typography>
-                                            )}
-                                        </Stack>
+                                        <Typography variant="body2">
+                                            {c.children?.length > 0 ? c.children.join(', ') : '-'}
+                                        </Typography>
                                     </TableCell>
                                     <TableCell>
                                         <Box sx={{ width: 24, height: 24, borderRadius: '50%', bgcolor: c.color, border: '1px solid #e0e0e0' }} />

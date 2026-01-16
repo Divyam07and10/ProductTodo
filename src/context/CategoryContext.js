@@ -111,7 +111,8 @@ export const CategoryProvider = ({ children }) => {
         onDeleteCancel: () => setCategoryIdToDelete(null),
         onClose: () => setIsDialogOpen(false),
         onInputChange: (k, v) => setCurrentCategory(prev => ({ ...prev, [k]: v })),
-        getCategoryById: (id) => categories.find(c => String(c.id) === String(id))
+        getCategoryById: (id) => categories.find(c => String(c.id) === String(id)),
+        getCategoryChildrenIds: (category) => category?.children || []
     };
 
     return (

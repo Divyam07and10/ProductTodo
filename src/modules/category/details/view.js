@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
-    Box, Typography, Paper, Grid, Stack, Button, Avatar, Chip
+    Box, Typography, Paper, Grid, Stack, Button, Avatar
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
@@ -14,7 +14,6 @@ import DeleteDialog from '../../../shared/components/DeleteDialog';
 
 const CategoryDetailView = () => {
     const { id } = useParams();
-    const navigate = useNavigate();
     const {
         getCategoryById,
         categories,
@@ -62,13 +61,6 @@ const CategoryDetailView = () => {
         );
     }
 
-    const childrenNames = category.children ? category.children.map(childId => {
-        const child = categories.find(c => c.id === childId);
-        return {
-            id: child ? child.id : childId,
-            name: child ? child.value : childId
-        };
-    }) : [];
 
     return (
         <Box sx={{ p: 4, maxWidth: 1400, mx: 'auto' }}>
@@ -96,21 +88,15 @@ const CategoryDetailView = () => {
 
                             <Box sx={{ mt: 1 }}>
                                 <Typography variant="caption" color="textSecondary" display="block" gutterBottom>Children:</Typography>
-                                {childrenNames.length > 0 ? (
-                                    <Stack direction="row" gap={1} flexWrap="wrap">
-                                        {childrenNames.map((child, index) => (
-                                            <Chip
-                                                key={index}
-                                                label={child.name}
-                                                size="small"
-                                                onClick={() => navigate(`/category/${child.id}`)}
-                                                clickable
-                                            />
-                                        ))}
-                                    </Stack>
-                                ) : (
-                                    <Typography variant="body2" color="textSecondary">-</Typography>
-                                )}
+                                <Typography variant="body1">
+                                    {category.children?.length > 0
+                                        ? category.children.map(childId => {
+                                            const child = categories.find(c => c.id === childId);
+                                            return child ? child.value : childId;
+                                        }).join(', ')
+                                        : '-'
+                                    }
+                                </Typography>
                             </Box>
                         </Box>
 
