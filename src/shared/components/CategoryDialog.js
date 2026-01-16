@@ -38,7 +38,7 @@ const CategoryDialog = ({ open, currentCategory, onClose, onSave, onInputChange,
                                 renderValue={(selected) => (
                                     <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                         {selected.map((value) => {
-                                            const category = categories.find(c => c.id === value || c.value === value);
+                                            const category = categories.find(c => c.id === value);
                                             return <Chip key={value} label={category ? category.value : value} />;
                                         })}
                                     </Box>

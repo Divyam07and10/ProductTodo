@@ -63,7 +63,7 @@ const CategoryDetailView = () => {
     }
 
     const childrenNames = category.children ? category.children.map(childId => {
-        const child = categories.find(c => c.id === childId || c.value === childId);
+        const child = categories.find(c => c.id === childId);
         return {
             id: child ? child.id : childId,
             name: child ? child.value : childId

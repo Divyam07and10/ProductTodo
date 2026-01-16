@@ -70,7 +70,7 @@ const CategoryView = () => {
                                         <Stack direction="row" gap={0.5} flexWrap="wrap">
                                             {c.children && c.children.length > 0 ? (
                                                 c.children.map((childId) => {
-                                                    const child = categories.find(cat => cat.id === childId || cat.value === childId);
+                                                    const child = categories.find(cat => cat.id === childId);
                                                     return <Chip key={childId} label={child ? child.value : childId} size="small" />;
                                                 })
                                             ) : (
