@@ -61,7 +61,6 @@ const CategoryDetailView = () => {
         );
     }
 
-
     return (
         <Box sx={{ p: 4, maxWidth: 1400, mx: 'auto' }}>
             <Box sx={{ flexGrow: 1, mb: 4 }}>
