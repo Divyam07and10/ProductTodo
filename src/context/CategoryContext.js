@@ -60,7 +60,7 @@ export const CategoryProvider = ({ children }) => {
                 ...currentCategory,
                 value: categoryName,
                 label: isEdit ? currentCategory.label : categoryName.toLowerCase(),
-                color: categoryColor || '#000000' // Ensure color is present
+                color: categoryColor
             };
 
             const data = await (isEdit ? service.updateCategory(categoryToSave) : service.addCategory(categoryToSave));

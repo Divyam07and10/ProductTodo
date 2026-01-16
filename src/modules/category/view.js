@@ -1,8 +1,7 @@
 import React from 'react';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import {
     Box, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Paper, IconButton, Typography, Link, Stack, Chip
+    Paper, IconButton, Typography, Stack, Chip
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -24,7 +23,6 @@ const CategoryView = () => {
         onAdd, onEdit, onDeleteClick, onDeleteCancel,
         onClose, onInputChange
     } = useCategoryContext();
-    const navigate = useNavigate();
 
     return (
         <Box sx={{ p: 4, maxWidth: 1200, mx: 'auto' }}>
