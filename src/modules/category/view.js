@@ -1,17 +1,17 @@
 import React from 'react';
-import { useCategoryContext } from '../../context/CategoryContext';
-
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import {
     Box, Button, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-    Paper, IconButton, Dialog, DialogActions, DialogContent, DialogTitle,
-    Typography, Stack
+    Paper, IconButton, Typography, Link, Stack, Chip
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddIcon from '@mui/icons-material/Add';
-import CloseIcon from '@mui/icons-material/Close';
 import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import { useCategoryContext } from '../../context/CategoryContext';
+import CategoryDialog from '../../shared/components/CategoryDialog';
+import DeleteDialog from '../../shared/components/DeleteDialog';
 
 const CategoryView = () => {
     const {
@@ -24,9 +24,10 @@ const CategoryView = () => {
         onAdd, onEdit, onDeleteClick, onDeleteCancel,
         onClose, onInputChange
     } = useCategoryContext();
+    const navigate = useNavigate();
 
     return (
-        <Box sx={{ p: 4, maxWidth: 1000, mx: 'auto' }}>
+        <Box sx={{ p: 4, maxWidth: 1200, mx: 'auto' }}>
             <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 4 }}>Category Management</Typography>
 
             <Paper elevation={0} sx={{ p: 2, mb: 4, borderRadius: 4, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', border: '1px solid #e0e0e0' }}>
@@ -47,6 +48,7 @@ const CategoryView = () => {
                         <TableRow>
                             <TableCell sx={{ fontWeight: 'bold', width: '80px' }}>ID</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+                            <TableCell sx={{ fontWeight: 'bold' }}>Children</TableCell>
                             <TableCell sx={{ fontWeight: 'bold' }}>Color</TableCell>
                             <TableCell sx={{ fontWeight: 'bold', width: '120px' }} align="right">Actions</TableCell>
                         </TableRow>
@@ -55,7 +57,7 @@ const CategoryView = () => {
                     <TableBody>
                         {categories.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={4} align="center" sx={{ py: 8 }}>
+                                <TableCell colSpan={5} align="center" sx={{ py: 8 }}>
                                     <Typography variant="h6" color="textSecondary">No categories found</Typography>
                                 </TableCell>
                             </TableRow>
@@ -63,7 +65,21 @@ const CategoryView = () => {
                             categories.map((c, index) => (
                                 <TableRow key={c.value + index} hover>
                                     <TableCell>{c.id || '-'}</TableCell>
-                                    <TableCell sx={{ fontWeight: 500 }}>{c.value || '-'}</TableCell>
+                                    <TableCell>
+                                        {c.value || '-'}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Stack direction="row" gap={0.5} flexWrap="wrap">
+                                            {c.children && c.children.length > 0 ? (
+                                                c.children.map((childId) => {
+                                                    const child = categories.find(cat => cat.id === childId || cat.value === childId);
+                                                    return <Chip key={childId} label={child ? child.value : childId} size="small" />;
+                                                })
+                                            ) : (
+                                                <Typography variant="caption" color="textSecondary">-</Typography>
+                                            )}
+                                        </Stack>
+                                    </TableCell>
                                     <TableCell>
                                         <Box sx={{ width: 24, height: 24, borderRadius: '50%', bgcolor: c.color, border: '1px solid #e0e0e0' }} />
                                     </TableCell>
@@ -83,64 +99,22 @@ const CategoryView = () => {
                 </Table>
             </TableContainer>
 
-            <Dialog open={isDialogOpen} onClose={onClose} fullWidth maxWidth="sm">
-                <form onSubmit={onSave}>
-                    <DialogTitle>
-                        {currentCategory?.id ? 'Edit Category' : 'Add Category'}
-                        <IconButton onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8, color: 'grey.500' }}>
-                            <CloseIcon />
-                        </IconButton>
-                    </DialogTitle>
-                    <DialogContent dividers>
-                        <Stack spacing={3} sx={{ mt: 1 }}>
-                            <TextField
-                                required
-                                label="Category Name"
-                                fullWidth
-                                value={currentCategory?.name || ''}
-                                onChange={(e) => onInputChange('name', e.target.value)}
-                                placeholder="e.g. Electronics"
-                            />
-                            <Box>
-                                <Typography variant="subtitle2" sx={{ mb: 1 }}>Category Color (Must be unique)</Typography>
-                                <Stack direction="row" spacing={2} alignItems="center">
-                                    <input
-                                        type="color"
-                                        style={{ width: 50, height: 50, padding: 0, border: 'none', borderRadius: 4, cursor: 'pointer' }}
-                                        value={currentCategory?.color || '#000000'}
-                                        onChange={(e) => onInputChange('color', e.target.value)}
-                                    />
-                                </Stack>
-                            </Box>
-                        </Stack>
-                    </DialogContent>
+            <CategoryDialog
+                open={isDialogOpen}
+                currentCategory={currentCategory}
+                onClose={onClose}
+                onSave={onSave}
+                onInputChange={onInputChange}
+                categories={categories}
+            />
 
-                    <DialogActions sx={{ p: 2 }}>
-                        <Button onClick={onClose}>Cancel</Button>
-                        <Button type="submit" variant="contained">Save</Button>
-                    </DialogActions>
-                </form>
-            </Dialog>
-
-            <Dialog open={Boolean(categoryIdToDelete)} onClose={onDeleteCancel}>
-                <DialogTitle>
-                    Confirm Deletion
-                    <IconButton onClick={onDeleteCancel} sx={{ position: 'absolute', right: 8, top: 8, color: 'grey.500' }}>
-                        <CloseIcon />
-                    </IconButton>
-                </DialogTitle>
-                <DialogContent dividers sx={{ borderBottom: 'none' }}>
-                    <Typography>
-                        Are you sure you want to delete the category <strong>"{categoryIdToDelete?.value}"</strong>?
-                        This action cannot be undone and will fail if products are linked to it.
-                    </Typography>
-                </DialogContent>
-
-                <DialogActions sx={{ p: 2 }}>
-                    <Button onClick={onDeleteCancel}>Cancel</Button>
-                    <Button onClick={onDeleteConfirm} variant="contained" color="error">Delete</Button>
-                </DialogActions>
-            </Dialog>
+            <DeleteDialog
+                open={Boolean(categoryIdToDelete)}
+                onCancel={onDeleteCancel}
+                onConfirm={onDeleteConfirm}
+                title="Delete Category"
+                content={`Are you sure you want to delete the category "${categoryIdToDelete?.value}"? This action cannot be undone and will fail if products are linked to it.`}
+            />
         </Box>
     );
 };
