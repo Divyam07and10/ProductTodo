@@ -8,7 +8,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 import { useProductContext } from '../../context/ProductContext';
-import { useCategoryContext } from '../../context/CategoryContext';
 import ProductTable from '../../shared/components/ProductTable';
 import ProductDialog from '../../shared/components/ProductDialog';
 import DeleteDialog from '../../shared/components/DeleteDialog';
@@ -16,12 +15,10 @@ import DeleteDialog from '../../shared/components/DeleteDialog';
 const ProductView = () => {
     const {
         products,
-        searchQuery, setSearchQuery, filterCategory, setFilterCategory, sortBy, setSortBy,
+        searchQuery, setSearchQuery, sortBy, setSortBy,
         isDialogOpen, currentProduct, productIdToDelete,
         onAdd, onEdit, onDeleteClick, onDeleteConfirm, onDeleteCancel, onClose, onSave, onClear, onInputChange
     } = useProductContext();
-
-    const { categories } = useCategoryContext();
 
     return (
         <Box sx={{ p: 4, maxWidth: 1400, mx: 'auto' }}>
@@ -29,20 +26,6 @@ const ProductView = () => {
 
             <Paper elevation={0} sx={{ p: 2, mb: 4, borderRadius: 4, display: 'flex', gap: 2, alignItems: 'center', flexWrap: 'wrap', border: '1px solid #e0e0e0' }}>
                 <TextField placeholder="Search..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} sx={{ flexGrow: 1, minWidth: 250 }} InputProps={{ startAdornment: <SearchIcon color="action" sx={{ mr: 1 }} /> }} />
-                <FormControl sx={{ minWidth: 200 }}>
-                    <InputLabel>Category</InputLabel>
-                    <Select value={filterCategory} label="Category" onChange={(e) => setFilterCategory(e.target.value)}>
-                        <MenuItem value="all">All Categories</MenuItem>
-                        {categories.map(cat => (
-                            <MenuItem key={cat.value} value={cat.value}>
-                                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-                                    <Box sx={{ width: 12, height: 12, borderRadius: '50%', bgcolor: cat.color || '#e0e0e0' }} />
-                                    {cat.value}
-                                </Box>
-                            </MenuItem>
-                        ))}
-                    </Select>
-                </FormControl>
                 <FormControl sx={{ minWidth: 200 }}>
                     <InputLabel>Sort By</InputLabel>
                     <Select value={sortBy} label="Sort By" onChange={(e) => setSortBy(e.target.value)}>
@@ -63,7 +46,6 @@ const ProductView = () => {
                 onClose={onClose}
                 onSave={onSave}
                 onInputChange={onInputChange}
-                categories={categories}
             />
 
             <DeleteDialog

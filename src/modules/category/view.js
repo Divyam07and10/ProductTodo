@@ -67,7 +67,13 @@ const CategoryView = () => {
                                     </TableCell>
                                     <TableCell>
                                         <Typography variant="body2">
-                                            {c.children?.length > 0 ? c.children.join(', ') : '-'}
+                                            {c.children?.length > 0
+                                                ? c.children.map(childId => {
+                                                    const child = categories.find(cat => cat.id === childId);
+                                                    return child ? child.value : childId;
+                                                }).join(', ')
+                                                : '-'
+                                            }
                                         </Typography>
                                     </TableCell>
                                     <TableCell>
